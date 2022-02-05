@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>BlotBot</title>
+	<desc>Draws a symmetrical design based on the eight character hexadecimal code you provide.</desc>
+	<defs>
+		<rect id="box" width="100" height="100" fill="inherit"/>
+		<path id="pie" d="m0,0l100,0c0,55.2486 -44.7514,100 -100,100l0,-100z" fill="inherit" />
+		<path id="tri" d="M 0,0 100,0 0,100 z" fill="inherit" />
+		<path id="bite" d="m0,100c0,-55.2486 44.7514,-100 100,-100l-100,0l0,100z" fill="inherit" />
+		<path id="hole" d="m20,50c0,-16.57458 13.42542,-30 30,-30c16.57458,0 30,13.42542 30,30c0,16.57458 -13.42542,30 -30,30c-16.57458,0 -30,-13.42542 -30,-30z M 0,0 100,0 100,100 0,100 z" fill-rule="evenodd" fill="inherit" />
+		<circle id="dot" cx="50" cy="50" r="35" fill="inherit" />
+		<rect id="not" width="100" height="100" fill="#fff" stroke-width="0" />
+	</defs>
+	<rect width="100%" height="100%" fill="#fff"/>
+	<g id="thing" fill="#000" stroke-width=".3" stroke="#000" transform="translate(250,50)">
+		<g id="side">
+			<use transform="translate(0,0)" />
+			<use transform="translate(0,100)" />
+			<use transform="translate(0,200)" /> 
+			<use transform="translate(0,300)" />
+			<use transform="translate(100,0)" />
+			<use transform="translate(100,100)" />
+			<use transform="translate(100,200)" />
+			<use transform="translate(100,300)" />
+		</g>
+		<use xlink:href="#side" transform="scale(-1, 1)" />
+	</g>
+<script>
+<![CDATA[
+xmlns="http://www.w3.org/2000/svg"
+xlink="http://www.w3.org/1999/xlink"
+
+	var root = document.documentElement;
+	var thing = root.getElementsByTagName('g').item(0);
+	var thingparts = thing.getElementsByTagName('g').item(0).getElementsByTagName('use');
+	var parts = [
+		'not','dot','box','hole','pie','tri','bite','box' // box twice more likely to occur
+	];
+	var aspect = [
+		0,90,180,270
+	];
+	// return aspect from given partno
+	var readAspect = function(partno){
+		if (partno > 3) {
+			return aspect[partno % 4]
+		} else {
+			// shape has rotational symmetry 
+			return 0;
+		}
+	};
+	// return part from given partno
+	var readPart = function(partno){
+		if (partno < 4) {
+			return parts[partno];
+		} else if (partno < 8) {
+			return parts[4];
+		} else if (partno < 12) {
+			return parts[5];
+		} else {
+			return parts[6];
+		}
+	};
+	// return partno from given part index and aspect index
+	var partNo = function(partidx,aspectidx){
+		if (partidx < 4) {
+			return partidx;
+		} else if (partidx == 4) {
+			return partidx + aspectidx;
+		} else if (partidx == 5) {
+			return partidx + aspectidx + 3;
+		} else if (partidx == 6) {
+			return partidx + aspectidx + 6;
+		} else if (partidx == 7) {
+			return 2;
+		}
+	};
+	var setPart = function(el,part){
+		return el.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href','#'+part);
+	};
+	var rotate = function(el,flip){
+		var thistransform = el.getAttributeNS(null,'transform');
+		// clear existing rotation
+		thistransform = thistransform.replace(/ rotate\([^\)]+\)/,'');
+		el.setAttributeNS(null,'transform',thistransform + ' rotate('+flip+',50,50)');
+	};
+	var draw = function(code){
+		var codes = code.substr(1).split('');
+		for ( i = 0; i < codes.length; i++ ) {
+			var partno = parseInt(codes[i],16);
+			setPart(thingparts.item(i), readPart(partno) );
+			rotate(thingparts.item(i), readAspect(partno) );
+		}
+	};
+	
+	
+	if (location.hash) { // location within SVG scope
+		draw(location.hash);
+	} else { // ensure BB object exists
+		if (parent.BB) {
+			parent.BB.drawbot = draw;
+		} else {
+			parent.BB = {
+				drawbot : draw
+			};
+		}
+		if (parent.BB.updatebot) {
+			parent.BB.updatebot();
+		}
+	}
+	
+	
+
+]]>
+</script>
+<!--	
+BlotBot made by 
+Oliver Boermans 
+http://www.ollicle.com/
+@ollicle
+-->
+</svg>
