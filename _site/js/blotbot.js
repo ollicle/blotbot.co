@@ -42,8 +42,6 @@ if (BB.drawbot) {
 $(window).bind('hashchange',function(){
 	BB.updatebot();
 	BB.updatelayout();
-	BB.changes = BB.changes?BB.changes+1 : 1;
-	_gaq.push(['_trackEvent', 'bot', 'change', location.hash, BB.changes]);
 });
 
 $(function(){
@@ -52,7 +50,3 @@ $(function(){
 	});
 	BB.updatelayout();
 });
-
-if (location.hash) {
-	_gaq.push(['_trackEvent', 'bot', 'landing', location.hash]);
-}
